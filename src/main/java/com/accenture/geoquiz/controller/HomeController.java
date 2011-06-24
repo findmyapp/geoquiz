@@ -1,4 +1,4 @@
-package com.accenture.geoquiz;
+package com.accenture.geoquiz.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,6 @@ public class HomeController {
 	public String home() {
 		logger.info("Welcome home!");
 		return "home";
-		
 	}
 	
 }
