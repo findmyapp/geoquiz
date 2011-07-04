@@ -32,4 +32,4 @@ INSERT into event_user values(
 	'nickman',
 	'48199669'
 );
-CREATE table postAnswer(event_id int, user_email int, question_id int, answer varchar(100) PRIMARY KEY(event_id, user_email, question_id));
+CREATE table post_answer(event_id int, question_id int, user_email varchar(100), answer varchar(100), PRIMARY KEY(event_id, user_email, question_id));
