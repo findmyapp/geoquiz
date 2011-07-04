@@ -14,7 +14,7 @@ INSERT into event values(
 CREATE table question(id int, question varchar(255), answer varchar(100), PRIMARY KEY(id));
 INSERT into question values(
 	0,
-	'intvalue("leet")=?',
+	'intvalue("leet") blir ...',
 	'1337'
 );
 CREATE table event_question(question_id int, event_id int, post_num int, description varchar(255), activation_code varchar(100), PRIMARY KEY(question_id, event_id));
@@ -23,7 +23,7 @@ INSERT into event_question values(
 	0,
 	1,
 	'EL5',
-	'1337'
+	'test'
 );
 CREATE table event_user(event_id int, email varchar(100), nick varchar(100), phone varchar(12), PRIMARY KEY(event_id, email));
 INSERT into event_user values(

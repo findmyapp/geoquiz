@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!-- <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page session="false" %>
 <html>
 <head>
@@ -10,3 +10,5 @@
 </h1>
 </body>
 </html>
+-->
+{"event":${events}}
