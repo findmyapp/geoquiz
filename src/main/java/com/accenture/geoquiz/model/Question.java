@@ -6,6 +6,7 @@ public class Question {
 	private String question;
 	private String answer;
 	private String postDescription;
+	private String activationCode;
 	
 	public void setId(int id) {
 		this.id = id;
@@ -31,5 +32,10 @@ public class Question {
 	public String getPostDescription() {
 		return postDescription;
 	}
-	
+	public void setActivationCode(String activationCode) {
+		this.activationCode = activationCode;
+	}
+	public String getActivationCode() {
+		return activationCode;
+	}
 }

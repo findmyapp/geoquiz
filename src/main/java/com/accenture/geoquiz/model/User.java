@@ -2,15 +2,16 @@ package com.accenture.geoquiz.model;
 
 public class User {
 	
-	private int id;
+	private int eventId;
 	private String nickname;
 	private String email;
+	private String phone;
 	
-	public void setId(int id) {
-		this.id = id;
+	public void setEventId(int id) {
+		this.eventId = id;
 	}
-	public int getId() {
-		return id;
+	public int getEventId() {
+		return eventId;
 	}
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
@@ -23,6 +24,12 @@ public class User {
 	}
 	public String getEmail() {
 		return email;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 	
 	// legg til spørsmål som er besvart/ikke besvart
