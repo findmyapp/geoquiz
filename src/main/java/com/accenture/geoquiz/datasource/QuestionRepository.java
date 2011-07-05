@@ -34,11 +34,19 @@ public class QuestionRepository {
 	}
 	public void addQuestion(String question, String answer) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		int id = 1234;
+		int id = 1234;//Maa ordne auto_increment
 		jdbcTemplate.execute("INSERT into question values("+id+", '"+question+"', '"+answer+"')");
 	}
 	public void removeQuestion(int id) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		jdbcTemplate.execute("DELETE from question where id = " + id);
+	}
+	public void addEventQuestion(int eventId, int questionId, String desc, String aCode) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.execute("INSERT into event_question values("+questionId+", "+eventId+", '"+desc+"', '"+aCode+"')");
+	}
+	public void removeEventQuestion(int eventId, int questionId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.execute("DELETE from event_question where event_id = "+eventId+" AND question_id = "+questionId);
 	}
 }

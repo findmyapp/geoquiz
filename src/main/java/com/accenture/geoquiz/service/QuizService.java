@@ -98,8 +98,6 @@ public class QuizService {
 		placeData.addPlace(p);
 	}
 	public void removePlace(int id) {
-		//Place p = new Place();
-		//p.setId(id);
 		placeData.removePlace(id);
 	}
 	public void addQuestion(String question, String answer) {
@@ -109,5 +107,11 @@ public class QuizService {
 	public void removeQuestion(int id) {
 		//remove
 		questionData.removeQuestion(id);
+	}
+	public void addEventQuestion(int eventId, int questionId, String description, String activationCode) {
+		questionData.addEventQuestion(eventId, questionId, description, activationCode);
+	}
+	public void removeEventQuestion(int eventId, int questionId) {
+		questionData.removeEventQuestion(eventId, questionId);
 	}
 }

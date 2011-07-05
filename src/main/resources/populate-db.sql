@@ -17,11 +17,10 @@ INSERT into question values(
 	'intvalue("leet") blir ...',
 	'1337'
 );
-CREATE table event_question(question_id int, event_id int, post_num int, description varchar(255), activation_code varchar(100), PRIMARY KEY(question_id, event_id));
+CREATE table event_question(question_id int, event_id int, description varchar(255), activation_code varchar(100), PRIMARY KEY(question_id, event_id));
 INSERT into event_question values(
 	0,
 	0,
-	1,
 	'EL5',
 	'test'
 );

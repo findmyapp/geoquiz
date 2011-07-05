@@ -43,7 +43,7 @@ public class EventQuestionController {
 			@RequestParam(required=true) String description,
 			@RequestParam(required=true) String activationCode) {
 		logger.info("add the new question to event "+eventId);
-		//save question to db
+		service.addEventQuestion(eventId, questionId, description, activationCode);
 		return new ModelAndView("redirect:event?eventId="+eventId);
 	}
 	
@@ -55,7 +55,7 @@ public class EventQuestionController {
 			@RequestParam(required=true) int eventId,
 			@RequestParam(required=true) int questionId) {
 		logger.info("removing eventquestion");
-		//remove event_question from db
+		service.removeEventQuestion(eventId, questionId);
 		return new ModelAndView("redirect:event?eventId="+eventId);
 	}
 }
