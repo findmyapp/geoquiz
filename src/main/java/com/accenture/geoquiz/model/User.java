@@ -1,11 +1,15 @@
 package com.accenture.geoquiz.model;
 
+import java.sql.Timestamp;
+
 public class User {
 	
 	private int eventId;
 	private String nickname;
 	private String email;
 	private String phone;
+	private int answered;
+	private Timestamp finishTime;
 	
 	public void setEventId(int id) {
 		this.eventId = id;
@@ -31,6 +35,16 @@ public class User {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
-	// legg til spørsmål som er besvart/ikke besvart
+	public void setAnswered(int n) {
+		answered = n;
+	}
+	public int getAnswered() {
+		return answered;
+	}
+	public void setFinishTime(Timestamp stamp) {
+		finishTime = stamp;
+	}
+	public Timestamp getFinishTime() {
+		return finishTime;
+	}
 }

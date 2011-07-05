@@ -25,11 +25,12 @@ INSERT into event_question values(
 	'EL5',
 	'test'
 );
-CREATE table event_user(event_id int, email varchar(100), nick varchar(100), phone varchar(12), PRIMARY KEY(event_id, email));
+CREATE table event_user(event_id int, email varchar(100), nick varchar(100), phone varchar(12), answered int, finish_time date, PRIMARY KEY(event_id, email));
 INSERT into event_user values(
 	0,
 	'abc@de.fg',
 	'nickman',
-	'48199669'
+	'48199669',
+	1,
+	'2011-10-10'
 );
-CREATE table post_answer(event_id int, question_id int, user_email varchar(100), answer varchar(100), PRIMARY KEY(event_id, user_email, question_id));
