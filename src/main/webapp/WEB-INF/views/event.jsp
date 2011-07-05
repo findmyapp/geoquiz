@@ -18,7 +18,7 @@
 	<input type="hidden" name="eventId" value="<%=event.getId() %>" />
 	Title: <input type="text" name="title" value="<%=event.getTitle() %>" /> <br />
 	<% String s = event.getEventDate().toString(); %>
-	Date: <input type="text" name="date" value="<%=s.substring(0, 16) %>" /> <br />
+	Date: <input type="text" name="date" value="<%=s.substring(0, 16) %>" />yyyy-mm-dd hh:ss <br />
 	<% if (event.isOpen()) {%>
 		Open: <input type="checkbox" name="open" value="true" checked /> <br />
 	<%} else { %>
@@ -54,11 +54,11 @@
 		<td><%=q.getQuestion() %></td>
 		<td><%=q.getPostDescription() %></td>
 		<td><%=q.getActivationCode() %></td>
-		<td><a href="removeQuestion?eventId=<%=event.getId() %>&questionId=<%=q.getId() %>"> (rm)</a></td>
+		<td><a href="removeEventQuestion?eventId=<%=event.getId() %>&questionId=<%=q.getId() %>"> (rm)</a></td>
 		</tr>
 	<%} %>
 	</table>
-	<a href="addQuestion?eventId=<%=event.getId() %>">+New question</a>
+	<a href="eventQuestion?eventId=<%=event.getId() %>">+New question</a>
 <%} %>
 </div>
 </div>
