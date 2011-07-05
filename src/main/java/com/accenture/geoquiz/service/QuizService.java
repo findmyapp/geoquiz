@@ -94,17 +94,20 @@ public class QuizService {
 	public void addPlace(String name) {
 		Place p = new Place();
 		p.setName(name);
-		//create new place
+		p.setId(1234); //Need dynamic id
+		placeData.addPlace(p);
 	}
 	public void removePlace(int id) {
-		Place p = new Place();
-		p.setId(id);
-		//remove place
+		//Place p = new Place();
+		//p.setId(id);
+		placeData.removePlace(id);
 	}
 	public void addQuestion(String question, String answer) {
 		//add
+		questionData.addQuestion(question, answer);
 	}
 	public void removeQuestion(int id) {
 		//remove
+		questionData.removeQuestion(id);
 	}
 }

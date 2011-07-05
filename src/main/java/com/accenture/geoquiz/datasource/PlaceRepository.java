@@ -24,4 +24,15 @@ public class PlaceRepository {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		return jdbcTemplate.queryForObject("SELECT * FROM place WHERE id=?", new PlaceRowMapper(), placeId);
 	}
+	public void addPlace(Place p){
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.execute("INSERT into place values("+p.getId()+", '"+p.getName()+"')");
+	}
+	public void removePlace(int id){
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.execute("DELETE from place where id = " + id);
+	}
+	
+	
 }
+

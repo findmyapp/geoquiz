@@ -32,4 +32,13 @@ public class QuestionRepository {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		return jdbcTemplate.query("SELECT * FROM question", new QuestionRowMapper(false));
 	}
+	public void addQuestion(String question, String answer) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		int id = 1234;
+		jdbcTemplate.execute("INSERT into question values("+id+", '"+question+"', '"+answer+"')");
+	}
+	public void removeQuestion(int id) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.execute("DELETE from question where id = " + id);
+	}
 }
