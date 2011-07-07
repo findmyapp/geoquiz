@@ -95,7 +95,7 @@
 		<td><%=u.getEmail() %></td>
 		<td><%=u.getPhone() %></td>
 		<td><%=u.getAnswered() %></td>
-		<td><%=u.getFinishTime().toString().substring(5) %></td>
+		<td><%=u.getFinishTime().toString().substring(5, 19) %></td>
 		</tr>
 	<% } %>
 	</table>

@@ -28,7 +28,7 @@ public class UserRepository {
 	
 	public List<User> getUser(int eventId) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		return jdbcTemplate.query("SELECT * FROM event_user WHERE event_id=? ORDER BY answered, finish_time", new UserRowMapper(), eventId);
+		return jdbcTemplate.query("SELECT * FROM event_user WHERE event_id=? ORDER BY answered DESC, finish_time ASC", new UserRowMapper(), eventId);
 	}
 	public void createUser(int eventId, String email, String nick, String phone, int answered, Timestamp finishTime) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
