@@ -1,6 +1,7 @@
 package com.accenture.geoquiz.service;
 
 import java.util.Date;
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -13,10 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.accenture.geoquiz.controller.admin.EventQuestionController;
 import com.accenture.geoquiz.datasource.*;
 import com.accenture.geoquiz.model.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @Service
 public class QuizService {
@@ -32,6 +36,8 @@ public class QuizService {
 	private DateFormat dateFormat;
 	@Autowired
 	private WhiteListService whiteService;
+	@Autowired
+	private Gson gson;
 	
 	private static final Logger logger = LoggerFactory.getLogger(EventQuestionController.class);
 	
@@ -96,7 +102,7 @@ public class QuizService {
 			}
 			if (!whiteService.isValid(title)) {
 				logger.info("title was invalid, "+title);
-				status.setNotification("title had invalid characters");
+				status.setNotification("Illegal characters in title, could not save.");
 				status.setError(true);
 			}
 			else if (eventId == -1) {//create new event
@@ -110,7 +116,7 @@ public class QuizService {
 		} catch (ParseException e) {
 			logger.info("date was in wrong format, "+date);
 			e.printStackTrace();
-			status.setNotification("date was in wrong format");
+			status.setNotification("Could not save, date was specified in wrong format");
 			status.setError(true);
 		}
 		
@@ -125,7 +131,7 @@ public class QuizService {
 		else {
 			logger.info("name was invalid, "+name);
 			status.setError(true);
-			status.setNotification("Illegal characters in name");
+			status.setNotification("Illegal characters in place name, could not save.");
 		}
 		return status;
 	}
@@ -136,11 +142,11 @@ public class QuizService {
 		Status status = new Status();
 		if (whiteService.isValid(name)) {
 			placeData.editPlace(id, name);
-			status.setNotification("Place "+name+" edited");
+			status.setNotification("Place "+name+" edited.");
 		}
 		else {
 			logger.info("name was invalid, "+name);
-			status.setNotification("Illegal characters in space name");
+			status.setNotification("Illegal characters in place name, could not save.");
 			status.setError(true);
 		}
 		return status;
@@ -150,12 +156,12 @@ public class QuizService {
 		if (!whiteService.isValid(question)) {
 			logger.info("question had invalid characters, "+question);
 			status.setError(true);
-			status.setNotification("Illegal characters in question");
+			status.setNotification("Illegal characters in question, could not save.");
 		}
 		else if (!whiteService.isValid(answer)) {
 			logger.info("answer had invalid characters, "+answer);
 			status.setError(true);
-			status.setNotification("Illegal characters in answer");
+			status.setNotification("Illegal characters in answer, could not save.");
 		}
 		else {
 			questionData.addQuestion(question, answer);
@@ -170,12 +176,12 @@ public class QuizService {
 		if (!whiteService.isValid(question)) {
 			logger.info("question had invalid characters, "+question);
 			status.setError(true);
-			status.setNotification("Illegal characters in question");
+			status.setNotification("Illegal characters in question, could not save.");
 		}
 		else if (!whiteService.isValid(answer)) {
 			logger.info("answer had invalid characters, "+answer);
 			status.setError(true);
-			status.setNotification("Illegal characters in question");
+			status.setNotification("Illegal characters in question, could not save.");
 		}
 		else {
 			questionData.editQuestion(id, question, answer);
@@ -186,9 +192,9 @@ public class QuizService {
 	public Status addEventQuestion(int eventId, int questionId, String description, String activationCode) {
 		Status status = new Status();
 		if (!whiteService.isValid(description)) {
-			logger.info("question had invalid characters, "+description);
+			logger.info("Description had invalid characters, "+description);
 			status.setError(true);
-			status.setNotification("Illegal characters in question");
+			status.setNotification("Illegal characters in description, could ont save.");
 			status.setId(eventId);
 		}
 		else if (!whiteService.isValid(activationCode)) {
@@ -205,5 +211,48 @@ public class QuizService {
 	}
 	public void removeEventQuestion(int eventId, int questionId) {
 		questionData.removeEventQuestion(eventId, questionId);
+	}
+	/**
+	 * Checks how many answers that are correct
+	 * @param user
+	 * @param answers
+	 * @return
+	 */
+	public int submitAnswers(String user, String answers) {
+		User u = gson.fromJson(user, User.class);
+		Type listType = new TypeToken<List<Question>>() {}.getType();
+		List<Question> hisAnswers = gson.fromJson(answers, listType);
+		List<Question> theAnswers = questionData.getQuestion(u.getEventId());
+		
+		User ourUser = userData.getUser(u.getEmail(), u.getEventId());
+		int equal = 0;
+		for (int i = 0; i < theAnswers.size(); i++) {
+			for (int j = 0; j < hisAnswers.size(); j++) {
+				if (theAnswers.get(i).getId() == hisAnswers.get(j).getId() && theAnswers.get(i).getAnswer().equalsIgnoreCase(hisAnswers.get(j).getAnswer())) {
+					equal++;
+				}
+			}
+		}
+		if (equal > ourUser.getAnswered()) {
+			ourUser.setAnswered(equal);
+			ourUser.setFinishTime(new Timestamp((new Date()).getTime()));
+		}
+		userData.updateAnswered(ourUser);
+		return ourUser.getAnswered();
+	}
+	public ModelAndView createUser(String user) {
+		ModelAndView data = new ModelAndView();
+		User u = gson.fromJson(user, User.class);
+		Event e = eventData.getEvent(u.getEventId());
+		if (e == null || !e.isOpen()) {
+			data.addObject("Accepted", false);
+			return data;
+		}
+		data.addObject("Accepted", true);
+		
+		u.setAnswered(0);
+		userData.createUser(u);
+		data.addObject("event", e);
+		return data;
 	}
 }

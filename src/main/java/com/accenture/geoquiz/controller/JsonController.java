@@ -29,15 +29,6 @@ public class JsonController {
 	private static final Logger logger = LoggerFactory.getLogger(JsonController.class);
 
 	/**
-	 * Simply selects the home view to render by returning its name.
-	 *
-	@RequestMapping(value="/", method=RequestMethod.GET)
-	public String home() {
-		logger.info("Welcome home!");
-		return "home";
-	}
-	
-	/**
 	 * List all open events
 	 */
 	@RequestMapping(value="/events", method=RequestMethod.GET)
@@ -48,7 +39,7 @@ public class JsonController {
 	}
 	/**
 	 * Get unhashed event (including questions)
-	 */
+	 * This method should probably not be available in the json api
 	@RequestMapping(value="/backend/event", method=RequestMethod.GET)
 	public ModelAndView getEvent(
 			@RequestParam(required=true) int eventId) {
@@ -65,6 +56,25 @@ public class JsonController {
 		logger.info("getting quiz for event :"+eventId);
 		Event event = service.getHashedEvent(eventId);
 		return new ModelAndView("json", "events", gson.toJson(event));
+	}
+	/**
+	 * Send in answers
+	 */
+	@RequestMapping(value="/respond", method=RequestMethod.GET)
+	public ModelAndView submitAnswers(
+			@RequestParam(required=true) String user,
+			@RequestParam(required=true) String answers) {
+		logger.info("Recieved answers");
+		int correct = service.submitAnswers(user, answers);
+		return new ModelAndView("json", "correct", 1);
+	}
+	public ModelAndView createUser(
+			@RequestParam(required=true) String user) {
+		logger.info("Request to create a new user");
+		ModelAndView data = service.createUser(user);
+		data.setViewName("json");
+		return data;
+		
 	}
 }
 

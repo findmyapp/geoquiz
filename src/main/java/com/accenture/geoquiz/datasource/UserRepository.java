@@ -34,8 +34,14 @@ public class UserRepository {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		jdbcTemplate.update("INSERT into event_user values(?, ?, ?, ?, ?, ?)", new UserRowMapper(), eventId, email, nick, phone, answered, finishTime);
 	}
+	public void createUser(User u) {
+		createUser(u.getEventId(), u.getEmail(), u.getNickname(), u.getPhone(), u.getAnswered(), u.getFinishTime());
+	}
 	public void updateAnswered(int eventId, String email, int answered, Timestamp finishTime) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		jdbcTemplate.update("UPDATE event_user SET answered=?, finish_time=? WHERE event_id=? AND email=?", answered, finishTime, eventId, email);
+	}
+	public void updateAnswered(User u) {
+		updateAnswered(u.getEventId(), u.getEmail(), u.getAnswered(), u.getFinishTime());
 	}
 }
