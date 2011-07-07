@@ -10,10 +10,12 @@
 	<link rel="shortcut icon" href="favicon.ico" /> 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
 	<meta name="description" content="" />  
-	<link href="css/stil.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="../resources/css/reset.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="../resources/css/stil.css" media="screen" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script> 
 </head> 
 <body>
+<div id="container">
 <div id="status">
 <% if (status.isError()) { %>
 	<div id="errorStatus"><%=status.getNotification() %></div>
@@ -21,25 +23,59 @@
 	<div id="okStatus"><%=status.getNotification() %></div>
 <% } %>
 </div>
-
+<div id="bodyContainer">
+<h1>Geo-Quiz Home</h1>
+<div id="leftList">
 <div id="eventList">
-	<h3>Events</h3>
+	<table>
+	<tr><th>Event name</th><th>Place</th></tr>
 	<% for (int i = 0; i < events.size(); i++) { 
-		Event e = events.get(i);
-		if (e.isOpen()) {%>
-			<div id="open">
+		Event e = events.get(i); %>
+		<tr>
+		<td>
+		<% if (e.isOpen()) {%>
+			<a href="event?eventId=<%=e.getId()%>" id="linkOpen"><%= e.getTitle() %></a>
 		<%} else { %>
-			<div id="closed">
+			<a href="event?eventId=<%=e.getId()%>" id="linkClosed"><%= e.getTitle() %></a>
 		<%} %>
-		<a href="event?eventId=<%=e.getId()%>"><%= e.getTitle() %></a><br />
-		</div>
+		</td><td>
+		<%=e.getPlace().getName() %>
+		</td>
+		</tr>
 	<% } %>
+	</table>
 	<a href="event?eventId=-1">+Add new event</a>
 </div>
+<div id="placeList">
+	<table>
+	<tr><th>Place name</th><th>Action</th></tr>
+	<% for (int i = 0; i < places.size(); i++) { 
+		Place p = places.get(i); %>
+		<tr>
+		<form action="editPlace" method="get">
+		<input type="hidden" name="id" value="<%=p.getId() %>" />
+		<td>
+		<input type="text" name="name" value="<%=p.getName() %>" />
+		</td>
+		<td>
+		<input type="submit" value="Change" />
+		</td>
+		</form>
+		</tr>
+	<% } %>
+	<tr>
+	<form action="addPlace" method="get">
+	<td><input type="text" name="name" /></td>
+	<td><input type="submit" value="Add place"/></td>
+	</form>
+	</tr>
+	</table>	
+</div>
+</div>
+<div id="rightList">
 <div id="questionList">
-	<h3>Questions</h3>
-	<table border="1">
-	<tr><th>Question</th><th>Answer</th><th>Change</th><th>Remove</th></tr>
+	<table>
+	<tr><th>Question</th><th>Answer</th><th>Action</th><th>Remove</th></tr>
 	<% for (int i = 0; i < questions.size(); i++) { 
 		Question q = questions.get(i); %>
 		<tr>
@@ -59,44 +95,20 @@
 		</td>
 		</form>
 		</tr>
-		
-		
-		
 	<% } %>
 	<tr>
 	<form action="addQuestion" method="get">
 	<td><input type="text" name="question" /></td>
 	<td><input type="text" name="answer" /></td>
 	<td><input type="submit" value="add question"/></td>
+	<td></td>
 	</form>
 	</tr>
 	</table>
 </div>
-<div id="placeList">
-	<h3>Places</h3>
-	<table border="1">
-	<tr><th>Name</th><th>Change</th></tr>
-	<% for (int i = 0; i < places.size(); i++) { 
-		Place p = places.get(i); %>
-		<tr>
-		<form action="editPlace" method="get">
-		<input type="hidden" name="id" value="<%=p.getId() %>" />
-		<td>
-		<input type="text" name="name" value="<%=p.getName() %>" />
-		</td>
-		<td>
-		<input type="submit" value="Change place" />
-		</td>
-		</form>
-		</tr>
-	<% } %>
-	<tr>
-	<form action="addPlace" method="get">
-	<td><input type="text" name="name" /></td>
-	<td><input type="submit" value="Add place"/></td>
-	</form>
-	</tr>
-	</table>	
+</div>
+<div style="clear:both"></div>
+</div>
 </div>
 </body>
 </html>

@@ -32,11 +32,11 @@ public class EventRepository {
 	}
 	public List<Event> getEvents() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		return jdbcTemplate.query("SELECT * FROM event AS e, place AS p WHERE e.place_id=p.id", new EventRowMapper());
+		return jdbcTemplate.query("SELECT * FROM event AS e, place AS p WHERE e.place_id=p.id ORDER BY event_date DESC", new EventRowMapper());
 	}
 	public List<Event> getOpenEvents() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		return jdbcTemplate.query("SELECT * FROM event AS e, place AS p WHERE e.place_id=p.id AND e.is_open='true'", new EventRowMapper());
+		return jdbcTemplate.query("SELECT * FROM event AS e, place AS p WHERE e.place_id=p.id AND e.is_open='true' ORDER BY event_date DESC", new EventRowMapper());
 	}
 	public void updateEvent(int eventId, String title, Date date, int placeId, Boolean open) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);

@@ -10,7 +10,7 @@ public class WhiteListService {
 	private Pattern pattern;
 	
 	public WhiteListService() {
-		pattern = Pattern.compile("^[a-zA-Z0-9æøåÆØÅ \\.\\<\\>\\+\\*\\(\\)\\-/=\\?,]*$");
+		pattern = Pattern.compile("^[a-zA-Z0-9æøåÆØÅ \\.\\<\\>\\+\\*\\(\\)\\-/=\\?,]+$");
 	}
 	
 	public Boolean isValid(String s) {

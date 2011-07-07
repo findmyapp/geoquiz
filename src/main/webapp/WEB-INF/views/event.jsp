@@ -10,10 +10,12 @@
 	<link rel="shortcut icon" href="favicon.ico" /> 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
 	<meta name="description" content="" />  
-	<link href="css/stil.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="../resources/css/reset.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="../resources/css/stil.css" media="screen" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script> 
 </head> 
 <body>
+<div id="container">
 <div id="status">
 <% if (status.isError()) { %>
 	<div id="errorStatus"><%=status.getNotification() %></div>
@@ -21,10 +23,16 @@
 	<div id="okStatus"><%=status.getNotification() %></div>
 <% } %>
 </div>
-
-<h3>Event <%=event.getId() %></h3>
-<div id="form">
+<div id="bodyContainer">
+<% if (event.getId() != -1) {%>
+	<h1>Event: <%=event.getTitle() %></h1>
+<% } else { %>
+	<h1>Create new Event</h1>
+<% } %>
+<div id="eventDetails">
+<div id="formWrapper">
 <form action="eventSubmit" method="get">
+	<div id="eventInfo">
 	<input type="hidden" name="eventId" value="<%=event.getId() %>" />
 	Title: <input type="text" name="title" value="<%=event.getTitle() %>" /> <br />
 	<% String s = event.getEventDate().toString(); %>
@@ -34,9 +42,9 @@
 	<%} else { %>
 		Open: <input type="checkbox" name="open" value="true" /> <br />
 	<%} %>
-	
-	<div id="placeList">
-	<h5>Places</h5>
+	</div>
+	<div id="eventPlaceList">
+	<h2>Places:</h2>
 	<% for (int i = 0; i < places.size(); i++) {
 		Place p = places.get(i);%>
 		<%if (p.getId() == event.getPlace().getId()) { %>
@@ -45,17 +53,18 @@
 			<input type="radio" name="placeId" value="<%=p.getId() %>" /><%=p.getName() %> <br />
 	<%} } %>
 	</div>
-	
-	<input type="submit" value="Save changes" /> <br />
-	
+	<div style="clear:both"></div>
+	<input type="submit" value="Save changes" />
+	<a href="home">Abandon changes and go home</a>	
 </form>
-<a href="home">Abandon changes and go home</a>
-<div id="questionList">
-<h5>List of questions</h5>
+</div>
+<div id="heightPad"></div>
+<div id="eventQuestionList">
+<h2>Questions</h2>
 <%if (event.getId() < 0) { %>
 	Create the event before adding questions
 <%} else { %>
-	<table border="1">
+	<table>
 	<tr>
 	<th>Question</th><th>Post Description</th><th>Activation code</th><th>Remove</th>
 	</tr>
@@ -74,8 +83,8 @@
 </div>
 </div>
 <div id="responders">
-<h5>Responders</h5>
-	<table border="1">
+<h2>Responders</h2>
+	<table>
 	<tr>
 	<th>Nickname</th><th>E-mail</th><th>Phone</th><th>Answered</th><th>Finish time</th>
 	</tr>
@@ -86,10 +95,13 @@
 		<td><%=u.getEmail() %></td>
 		<td><%=u.getPhone() %></td>
 		<td><%=u.getAnswered() %></td>
-		<td><%=u.getFinishTime() %></td>
+		<td><%=u.getFinishTime().toString().substring(5) %></td>
 		</tr>
 	<% } %>
 	</table>
+</div>
+<div style="clear:both"></div>
+</div>
 </div>
 </body>
 </html>
