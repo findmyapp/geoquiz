@@ -24,13 +24,19 @@ public class PlaceRepository {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		return jdbcTemplate.queryForObject("SELECT * FROM place WHERE id=?", new PlaceRowMapper(), placeId);
 	}
-	public void addPlace(Place p){
+	public void addPlace(String name){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("INSERT into place values("+p.getId()+", '"+p.getName()+"')");
+		jdbcTemplate.update("INSERT into place(name) VALUES (?)", name);
+		//jdbcTemplate.execute("INSERT into place (name) VALUES ('"+name+"')");
 	}
 	public void removePlace(int id){
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("DELETE from place where id = " + id);
+		jdbcTemplate.update("DELETE from place where id=?", id);
+		//jdbcTemplate.execute("DELETE from place where id = " + id);
+	}
+	public void editPlace(int id, String name) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.update("UPDATE place SET name=? WHERE id=?", name, id);
 	}
 	
 	

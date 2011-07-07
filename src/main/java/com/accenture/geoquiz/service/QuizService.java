@@ -1,13 +1,20 @@
 package com.accenture.geoquiz.service;
 
+import java.util.Date;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+
 import java.util.List;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.accenture.geoquiz.controller.admin.EventQuestionController;
 import com.accenture.geoquiz.datasource.*;
 import com.accenture.geoquiz.model.*;
 
@@ -21,6 +28,12 @@ public class QuizService {
 	private UserRepository userData;
 	@Autowired
 	private PlaceRepository placeData;
+	@Autowired
+	private DateFormat dateFormat;
+	@Autowired
+	private WhiteListService whiteService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(EventQuestionController.class);
 	
 	public List<Event> getEvents() {
 		return eventData.getEvents();
@@ -63,6 +76,9 @@ public class QuizService {
 	public List<Question> getQuestions() {
 		return questionData.getQuestions();
 	}
+	public List<Question> getUnusedQuestions(int eventId) {
+		return questionData.getUnusedQuestions(eventId);
+	}
 	
 	public List<Place> getPlaces() {
 		return placeData.getPlaces();
@@ -70,46 +86,122 @@ public class QuizService {
 	public Place getPlace(int id) {
 		return placeData.getPlace(id);
 	}
-	public int submitEvent(int eventId, String title, Timestamp date, int placeId, Boolean open) {
-		Event e = new Event();
-		e.setId(eventId);
-		e.setTitle(title);
-		e.setEventDate(date);
-		Place p = new Place();
-		p.setId(placeId);
-		e.setPlace(p);
-		if (open != null) {
-			e.setOpen(open);
-		} else {
-			e.setOpen(false);
+	public Status submitEvent(int eventId, String title, String date, int placeId, Boolean open) {
+		Date eventDate = null;
+		Status status = new Status();
+		try {
+			eventDate = (Date) dateFormat.parse(date);
+			if (open == null) {
+				open = false;
+			}
+			if (!whiteService.isValid(title)) {
+				logger.info("title was invalid, "+title);
+				status.setNotification("title had invalid characters");
+				status.setError(true);
+			}
+			else if (eventId == -1) {//create new event
+				eventId = eventData.createEvent(title, eventDate, placeId, open);
+				status.setNotification("Event created!");
+			}
+			else {//update old event
+				eventData.updateEvent(eventId, title, eventDate, placeId, open);
+				status.setNotification("Event "+title+" updated!");
+			}
+		} catch (ParseException e) {
+			logger.info("date was in wrong format, "+date);
+			e.printStackTrace();
+			status.setNotification("date was in wrong format");
+			status.setError(true);
 		}
-		if (eventId == -1) {
-			//create new event
+		
+		status.setId(eventId);
+		return status;
+	}
+	public Status addPlace(String name) {
+		Status status = new Status();
+		if (whiteService.isValid(name)) {
+			placeData.addPlace(name);
 		}
 		else {
-			//update old event
+			logger.info("name was invalid, "+name);
+			status.setError(true);
+			status.setNotification("Illegal characters in name");
 		}
-		return eventId;
-	}
-	public void addPlace(String name) {
-		Place p = new Place();
-		p.setName(name);
-		p.setId(1234); //Need dynamic id
-		placeData.addPlace(p);
+		return status;
 	}
 	public void removePlace(int id) {
 		placeData.removePlace(id);
 	}
-	public void addQuestion(String question, String answer) {
-		//add
-		questionData.addQuestion(question, answer);
+	public Status editPlace(int id, String name) {
+		Status status = new Status();
+		if (whiteService.isValid(name)) {
+			placeData.editPlace(id, name);
+			status.setNotification("Place "+name+" edited");
+		}
+		else {
+			logger.info("name was invalid, "+name);
+			status.setNotification("Illegal characters in space name");
+			status.setError(true);
+		}
+		return status;
+	}
+	public Status addQuestion(String question, String answer) {
+		Status status = new Status();
+		if (!whiteService.isValid(question)) {
+			logger.info("question had invalid characters, "+question);
+			status.setError(true);
+			status.setNotification("Illegal characters in question");
+		}
+		else if (!whiteService.isValid(answer)) {
+			logger.info("answer had invalid characters, "+answer);
+			status.setError(true);
+			status.setNotification("Illegal characters in answer");
+		}
+		else {
+			questionData.addQuestion(question, answer);
+		}
+		return status;
 	}
 	public void removeQuestion(int id) {
-		//remove
 		questionData.removeQuestion(id);
 	}
-	public void addEventQuestion(int eventId, int questionId, String description, String activationCode) {
-		questionData.addEventQuestion(eventId, questionId, description, activationCode);
+	public Status editQuestion(int id, String question, String answer) {
+		Status status = new Status();
+		if (!whiteService.isValid(question)) {
+			logger.info("question had invalid characters, "+question);
+			status.setError(true);
+			status.setNotification("Illegal characters in question");
+		}
+		else if (!whiteService.isValid(answer)) {
+			logger.info("answer had invalid characters, "+answer);
+			status.setError(true);
+			status.setNotification("Illegal characters in question");
+		}
+		else {
+			questionData.editQuestion(id, question, answer);
+			status.setNotification("Question edited!");
+		}
+		return status;
+	}
+	public Status addEventQuestion(int eventId, int questionId, String description, String activationCode) {
+		Status status = new Status();
+		if (!whiteService.isValid(description)) {
+			logger.info("question had invalid characters, "+description);
+			status.setError(true);
+			status.setNotification("Illegal characters in question");
+			status.setId(eventId);
+		}
+		else if (!whiteService.isValid(activationCode)) {
+			logger.info("answer had invalid characters, "+activationCode);
+			status.setError(true);
+			status.setNotification("Illegal characters in activation code");
+			status.setId(eventId);
+		}
+		else {
+			questionData.addEventQuestion(eventId, questionId, description, activationCode);
+			status.setId(eventId);
+		}
+		return status;
 	}
 	public void removeEventQuestion(int eventId, int questionId) {
 		questionData.removeEventQuestion(eventId, questionId);

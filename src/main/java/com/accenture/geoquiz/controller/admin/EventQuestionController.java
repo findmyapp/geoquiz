@@ -9,13 +9,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.accenture.geoquiz.model.Status;
 import com.accenture.geoquiz.service.QuizService;
-import com.google.gson.Gson;
 
 @Controller
 public class EventQuestionController {
-	@Autowired
-	private Gson gson;
 	@Autowired
 	private QuizService service;
 	
@@ -27,12 +25,17 @@ public class EventQuestionController {
 	@RequestMapping(value="/admin/eventQuestion", method=RequestMethod.GET)
 	public ModelAndView showQuestion(
 			@RequestParam(required=true) int eventId) {
+		return showQuestion(eventId, new Status());
+	}
+	private ModelAndView showQuestion(int eventId, Status status) {
 		logger.info("show new question for event "+eventId);
 		ModelAndView data = new ModelAndView("eventQuestion");
 		data.addObject("eventId", eventId);
-		data.addObject("questions", service.getQuestions());
+		data.addObject("questions", service.getUnusedQuestions(eventId));
+		data.addObject("status", status);
 		return data;
 	}
+	
 	/**
 	 * Controller to save questions to events
 	 */
@@ -43,8 +46,12 @@ public class EventQuestionController {
 			@RequestParam(required=true) String description,
 			@RequestParam(required=true) String activationCode) {
 		logger.info("add the new question to event "+eventId);
-		service.addEventQuestion(eventId, questionId, description, activationCode);
-		return new ModelAndView("redirect:event?eventId="+eventId);
+		Status status = service.addEventQuestion(eventId, questionId, description, activationCode);
+		if (!status.isError()) {
+			return new ModelAndView("redirect:event?eventId="+eventId);
+		} else {
+			return showQuestion(eventId, status);
+		}
 	}
 	
 	/**

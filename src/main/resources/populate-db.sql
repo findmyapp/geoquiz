@@ -1,9 +1,9 @@
-CREATE table place(id int, name varchar(100), PRIMARY KEY(id));
+CREATE table place(id int identity primary key, name varchar(100));
 INSERT into place values(
 	0,
 	'NTNU'
 );
-CREATE table event(id int, title varchar(100), event_date date, place_id int, is_open boolean, PRIMARY KEY(id));
+CREATE table event(id int identity primary key, title varchar(100), event_date date, place_id int, is_open boolean);
 INSERT into event values(
 	0,
 	'Bedpres ntnu',
@@ -11,10 +11,10 @@ INSERT into event values(
 	0,
 	'true'
 );
-CREATE table question(id int, question varchar(255), answer varchar(100), PRIMARY KEY(id));
+CREATE table question(id int identity primary key, question varchar(255), answer varchar(100));
 INSERT into question values(
 	0,
-	'intvalue("leet") blir ...',
+	'intvalue(leet) blir ...',
 	'1337'
 );
 CREATE table event_question(question_id int, event_id int, description varchar(255), activation_code varchar(100), PRIMARY KEY(question_id, event_id));

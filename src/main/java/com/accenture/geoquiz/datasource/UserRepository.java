@@ -1,5 +1,6 @@
 package com.accenture.geoquiz.datasource;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -27,15 +28,14 @@ public class UserRepository {
 	
 	public List<User> getUser(int eventId) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		return jdbcTemplate.query("SELECT * FROM event_user WHERE event_id=?", new UserRowMapper(), eventId);
+		return jdbcTemplate.query("SELECT * FROM event_user WHERE event_id=? ORDER BY answered, finish_time", new UserRowMapper(), eventId);
 	}
-	
-	public void createUser(User user) {
+	public void createUser(int eventId, String email, String nick, String phone, int answered, Timestamp finishTime) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("INSERT into event_user values("+user.getEventId()+", '"+user.getEmail()+"', '"+user.getNickname()+"', '"+user.getPhone()+"', "+user.getAnswered()+", '"+user.getFinishTime()+"')");
+		jdbcTemplate.update("INSERT into event_user values(?, ?, ?, ?, ?, ?)", new UserRowMapper(), eventId, email, nick, phone, answered, finishTime);
 	}
-	public void updateUser(User user) {
+	public void updateAnswered(int eventId, String email, int answered, Timestamp finishTime) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("");//update...
+		jdbcTemplate.update("UPDATE event_user SET answered=?, finish_time=? WHERE event_id=? AND email=?", answered, finishTime, eventId, email);
 	}
 }

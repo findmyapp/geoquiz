@@ -13,7 +13,7 @@ public class UserRowMapper implements RowMapper<User>{
 		User user = new User();
 		user.setEventId(rs.getInt("event_id"));
 		user.setEmail(rs.getString("email"));
-		user.setNickname(rs.getString("nickname"));
+		user.setNickname(rs.getString("nick"));
 		user.setPhone(rs.getString("phone"));
 		user.setAnswered(rs.getInt("answered"));
 		user.setFinishTime(rs.getTimestamp("finish_time"));

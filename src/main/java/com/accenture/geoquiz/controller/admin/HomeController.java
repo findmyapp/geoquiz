@@ -1,7 +1,5 @@
 package com.accenture.geoquiz.controller.admin;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,17 +9,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.accenture.geoquiz.controller.JsonController;
-import com.accenture.geoquiz.model.Event;
-import com.accenture.geoquiz.model.Place;
-import com.accenture.geoquiz.model.Question;
+import com.accenture.geoquiz.model.Status;
 import com.accenture.geoquiz.service.QuizService;
-import com.google.gson.Gson;
 
 @Controller
 public class HomeController {
-	@Autowired
-	private Gson gson;
 	@Autowired
 	private QuizService service;
 	
@@ -31,19 +23,22 @@ public class HomeController {
 	 */
 	@RequestMapping(value="/admin/home", method=RequestMethod.GET)
 	public ModelAndView getLists() {
+		return getLists(new Status());
+	}
+	private ModelAndView getLists(Status status) {
 		ModelAndView data = new ModelAndView("home");
 		logger.info("Loading home view data");
 		data.addObject("events", service.getEvents());
 		data.addObject("questions", service.getQuestions());
 		data.addObject("places", service.getPlaces());
+		data.addObject("status", status);
 		return data;
 	}
 	@RequestMapping(value="/admin/addPlace", method=RequestMethod.GET)
 	public ModelAndView addPlace(
 			@RequestParam(required=true) String name) {
 		logger.info("Adding place "+name);
-		service.addPlace(name);
-		return new ModelAndView("redirect:home");
+		return getLists(service.addPlace(name));
 	}
 	@RequestMapping(value="/admin/removePlace", method=RequestMethod.GET)
 	public ModelAndView removePlace(
@@ -52,13 +47,19 @@ public class HomeController {
 		service.removePlace(placeId);
 		return new ModelAndView("redirect:home");
 	}
+	@RequestMapping(value="/admin/editPlace", method=RequestMethod.GET)
+	public ModelAndView editPlace(
+			@RequestParam(required=true) int id,
+			@RequestParam(required=true) String name) {
+		logger.info("Renaming place "+id);
+		return getLists(service.editPlace(id, name));
+	}
 	@RequestMapping(value="/admin/addQuestion", method=RequestMethod.GET)
 	public ModelAndView addQuestion(
 			@RequestParam(required=true) String question,
 			@RequestParam(required=true) String answer) {
 		logger.info("Adding question "+question);
-		service.addQuestion(question, answer);
-		return new ModelAndView("redirect:home");
+		return getLists(service.addQuestion(question, answer));
 	}
 	@RequestMapping(value="/admin/removeQuestion", method=RequestMethod.GET)
 	public ModelAndView removeQuestion(
@@ -67,6 +68,12 @@ public class HomeController {
 		service.removeQuestion(questionId);
 		return new ModelAndView("redirect:home");
 	}
-	
-	
+	@RequestMapping(value="/admin/editQuestion", method=RequestMethod.GET)
+	public ModelAndView removeQuestion(
+			@RequestParam(required=true) int id,
+			@RequestParam(required=true) String question,
+			@RequestParam(required=true) String answer) {
+		logger.info("Editing question "+id);
+		return getLists(service.editQuestion(id, question, answer));
+	}
 }

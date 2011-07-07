@@ -32,21 +32,32 @@ public class QuestionRepository {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		return jdbcTemplate.query("SELECT * FROM question", new QuestionRowMapper(false));
 	}
+	public List<Question> getUnusedQuestions(int eventId) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		return jdbcTemplate.query("SELECT * FROM question WHERE id NOT IN (SELECT question_id FROM event_question WHERE event_id=?)", new QuestionRowMapper(false), eventId);
+	}
 	public void addQuestion(String question, String answer) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		int id = 1234;//Maa ordne auto_increment
-		jdbcTemplate.execute("INSERT into question values("+id+", '"+question+"', '"+answer+"')");
+		jdbcTemplate.update("INSERT into question (question, answer) values(?, ?)", question, answer);
+		//jdbcTemplate.execute("INSERT into question (question, answer) values('"+question+"', '"+answer+"')");
 	}
 	public void removeQuestion(int id) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("DELETE from question where id = " + id);
+		jdbcTemplate.update("DELETE from question WHERE id=?", id);
+		//jdbcTemplate.execute("DELETE from question where id = " + id);
+	}
+	public void editQuestion(int id, String question, String answer) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
+		jdbcTemplate.update("UPDATE question SET question=?, answer=? WHERE id=?", question, answer, id);
 	}
 	public void addEventQuestion(int eventId, int questionId, String desc, String aCode) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("INSERT into event_question values("+questionId+", "+eventId+", '"+desc+"', '"+aCode+"')");
+		jdbcTemplate.update("INSERT into event_question values(?, ?, ?, ?)", questionId, eventId, desc, aCode);
+		//jdbcTemplate.execute("INSERT into event_question values("+questionId+", "+eventId+", '"+desc+"', '"+aCode+"')");
 	}
 	public void removeEventQuestion(int eventId, int questionId) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.execute("DELETE from event_question where event_id = "+eventId+" AND question_id = "+questionId);
+		jdbcTemplate.update("DELETE from event_question WHERE event_id=? AND question_id=?", eventId, questionId);
+		//jdbcTemplate.execute("DELETE from event_question where event_id = "+eventId+" AND question_id = "+questionId);
 	}
 }
