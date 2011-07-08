@@ -29,9 +29,11 @@
 <% } else { %>
 	<h1>Create new Event</h1>
 <% } %>
+<div id="sitemap"><a href="home">Home</a>/Event</div>
+<div id="space"></div>
 <div id="eventDetails">
 <div id="formWrapper">
-<form action="eventSubmit" method="get">
+<form action="eventSubmit" method="post">
 	<div id="eventInfo">
 	<input type="hidden" name="eventId" value="<%=event.getId() %>" />
 	Title: <input type="text" name="title" value="<%=event.getTitle() %>" /> <br />
@@ -74,7 +76,8 @@
 		<td><%=q.getQuestion() %></td>
 		<td><%=q.getPostDescription() %></td>
 		<td><%=q.getActivationCode() %></td>
-		<td><a href="removeEventQuestion?eventId=<%=event.getId() %>&questionId=<%=q.getId() %>"> (rm)</a></td>
+		<td>
+		<a href="removeEventQuestion?eventId=<%=event.getId() %>&questionId=<%=q.getId() %>"> (rm)</a></td>
 		</tr>
 	<%} %>
 	</table>

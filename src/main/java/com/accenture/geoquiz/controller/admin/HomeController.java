@@ -34,41 +34,41 @@ public class HomeController {
 		data.addObject("status", status);
 		return data;
 	}
-	@RequestMapping(value="/admin/addPlace", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/addPlace", method=RequestMethod.POST)
 	public ModelAndView addPlace(
 			@RequestParam(required=true) String name) {
 		logger.info("Adding place "+name);
 		return getLists(service.addPlace(name));
 	}
-	@RequestMapping(value="/admin/removePlace", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/removePlace", method=RequestMethod.POST)
 	public ModelAndView removePlace(
 			@RequestParam(required=true) int placeId) {
 		logger.info("Removing place "+placeId);
 		service.removePlace(placeId);
 		return new ModelAndView("redirect:home");
 	}
-	@RequestMapping(value="/admin/editPlace", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/editPlace", method=RequestMethod.POST)
 	public ModelAndView editPlace(
 			@RequestParam(required=true) int id,
 			@RequestParam(required=true) String name) {
 		logger.info("Renaming place "+id);
 		return getLists(service.editPlace(id, name));
 	}
-	@RequestMapping(value="/admin/addQuestion", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/addQuestion", method=RequestMethod.POST)
 	public ModelAndView addQuestion(
 			@RequestParam(required=true) String question,
 			@RequestParam(required=true) String answer) {
 		logger.info("Adding question "+question);
 		return getLists(service.addQuestion(question, answer));
 	}
-	@RequestMapping(value="/admin/removeQuestion", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/removeQuestion", method=RequestMethod.POST)
 	public ModelAndView removeQuestion(
 			@RequestParam(required=true) int questionId) {
 		logger.info("Removing question "+questionId);
 		service.removeQuestion(questionId);
 		return new ModelAndView("redirect:home");
 	}
-	@RequestMapping(value="/admin/editQuestion", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/editQuestion", method=RequestMethod.POST)
 	public ModelAndView removeQuestion(
 			@RequestParam(required=true) int id,
 			@RequestParam(required=true) String question,

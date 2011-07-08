@@ -72,17 +72,16 @@ public class QuizService {
 			e.printStackTrace();
 			return null;
 		}
-		if (!event.isOpen()) {
-			return null;
+		if (event.isOpen()) {
+			List<Question> questions = questionData.getQuestion(eventId);
+			for (int i = 0; i < questions.size(); i++) {
+				String s = questions.get(i).getAnswer().toLowerCase();
+				questions.get(i).setAnswer(HashService.getHash(s));
+				s = questions.get(i).getActivationCode().toLowerCase();
+				questions.get(i).setActivationCode(HashService.getHash(s));
+			}
+			event.setQuestions(questions);
 		}
-		List<Question> questions = questionData.getQuestion(eventId);
-		for (int i = 0; i < questions.size(); i++) {
-			String s = questions.get(i).getAnswer().toLowerCase();
-			questions.get(i).setAnswer(HashService.getHash(s));
-			s = questions.get(i).getActivationCode().toLowerCase();
-			questions.get(i).setActivationCode(HashService.getHash(s));
-		}
-		event.setQuestions(questions);
 		return event;
 	}
 	

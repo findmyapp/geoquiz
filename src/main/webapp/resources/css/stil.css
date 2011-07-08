@@ -1,7 +1,6 @@
 body{
 	text-align: center;
 }
-
 #container {
 	margin: 0 auto;
 	text-align: left;
@@ -14,6 +13,14 @@ body{
 	text-align: center;
 	position:relative;
 	width:500px;
+}
+#sitemap {
+	border-bottom: 1px solid #C1DAD7;
+	padding-bottom: 5px;
+}
+#space {
+	height: 20px;
+	width: 700px;
 }
 #okStatus {
 	background-color:#BCF589;
@@ -80,7 +87,7 @@ h1 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 30px;
 	padding-top: 10px;
-	padding-bottom: 20px;
+	padding-bottom: 3px;
 }
 h2 {
 	text-align: center;
