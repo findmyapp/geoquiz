@@ -11,6 +11,13 @@ public class User {
 	private int answered;
 	private Timestamp finishTime;
 	
+	public User() {
+		eventId = -1;
+		nickname="none";
+		phone="none";
+		finishTime=new Timestamp(0);
+	}
+	
 	public void setEventId(int id) {
 		this.eventId = id;
 	}

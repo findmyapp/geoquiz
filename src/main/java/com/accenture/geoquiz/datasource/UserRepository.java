@@ -32,7 +32,7 @@ public class UserRepository {
 	}
 	public void createUser(int eventId, String email, String nick, String phone, int answered, Timestamp finishTime) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.update("INSERT into event_user values(?, ?, ?, ?, ?, ?)", new UserRowMapper(), eventId, email, nick, phone, answered, finishTime);
+		jdbcTemplate.update("INSERT into event_user values(?, ?, ?, ?, ?, ?)", eventId, email, nick, phone, answered, finishTime);
 	}
 	public void createUser(User u) {
 		createUser(u.getEventId(), u.getEmail(), u.getNickname(), u.getPhone(), u.getAnswered(), u.getFinishTime());

@@ -64,7 +64,16 @@ public class QuizService {
 		return event;
 	}
 	public Event getHashedEvent(int eventId) {//hash on answers
-		Event event = eventData.getEvent(eventId);
+		Event event;
+		try {
+			event = eventData.getEvent(eventId);
+		} catch (Exception e) {//most likely because event doesn't exist
+			e.printStackTrace();
+			return null;
+		}
+		if (!event.isOpen()) {
+			return null;
+		}
 		List<Question> questions = questionData.getQuestion(eventId);
 		for (int i = 0; i < questions.size(); i++) {
 			String s = questions.get(i).getAnswer().toLowerCase();
@@ -219,41 +228,53 @@ public class QuizService {
 	 * @return
 	 */
 	public int submitAnswers(String user, String answers) {
-		User u = gson.fromJson(user, User.class);
-		logger.info(u.getEmail());
-		Type listType = new TypeToken<List<Question>>() {}.getType();
-		List<Question> hisAnswers = gson.fromJson(answers, listType);
-		List<Question> theAnswers = questionData.getQuestion(u.getEventId());
-		
-		User ourUser = userData.getUser(u.getEmail(), u.getEventId());
-		int equal = 0;
-		for (int i = 0; i < theAnswers.size(); i++) {
-			for (int j = 0; j < hisAnswers.size(); j++) {
-				if (theAnswers.get(i).getId() == hisAnswers.get(j).getId() && theAnswers.get(i).getAnswer().equalsIgnoreCase(hisAnswers.get(j).getAnswer())) {
-					equal++;
+		try {
+			User u = gson.fromJson(user, User.class);
+			logger.info(u.getEmail());
+			Type listType = new TypeToken<List<Question>>() {}.getType();
+			List<Question> hisAnswers = gson.fromJson(answers, listType);
+			List<Question> theAnswers = questionData.getQuestion(u.getEventId());
+			
+			User ourUser = userData.getUser(u.getEmail(), u.getEventId());
+			int equal = 0;
+			for (int i = 0; i < theAnswers.size(); i++) {
+				for (int j = 0; j < hisAnswers.size(); j++) {
+					if (theAnswers.get(i).getId() == hisAnswers.get(j).getId() && theAnswers.get(i).getAnswer().equalsIgnoreCase(hisAnswers.get(j).getAnswer())) {
+						equal++;
+					}
 				}
 			}
+			if (equal > ourUser.getAnswered()) {
+				ourUser.setAnswered(equal);
+				ourUser.setFinishTime(new Timestamp((new Date()).getTime()));
+			}
+			userData.updateAnswered(ourUser);
+			return ourUser.getAnswered();
+		} 
+		catch (Exception e) {
+			//probably because json was in wrong format or user doesn't exsist
+			e.printStackTrace();
+			return 0;
 		}
-		if (equal > ourUser.getAnswered()) {
-			ourUser.setAnswered(equal);
-			ourUser.setFinishTime(new Timestamp((new Date()).getTime()));
-		}
-		userData.updateAnswered(ourUser);
-		return ourUser.getAnswered();
 	}
 	public ModelAndView createUser(String user) {
 		ModelAndView data = new ModelAndView();
-		User u = gson.fromJson(user, User.class);
-		Event e = eventData.getEvent(u.getEventId());
-		if (e == null || !e.isOpen()) {
-			data.addObject("Accepted", false);
+		try {
+			User u = gson.fromJson(user, User.class);
+			Event e = this.getHashedEvent(u.getEventId());
+			if (e == null || !e.isOpen()) {
+				data.addObject("Accepted", false);
+				return data;
+			}
+			data.addObject("Accepted", true);
+			u.setAnswered(0);
+			userData.createUser(u);
+			data.addObject("events", gson.toJson(e));
 			return data;
+		} catch (Exception e) {
+			//probably parsing error or user already exists
+			e.printStackTrace();
+			return new ModelAndView();
 		}
-		data.addObject("Accepted", true);
-		
-		u.setAnswered(0);
-		userData.createUser(u);
-		data.addObject("events", e);
-		return data;
 	}
 }
