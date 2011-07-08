@@ -25,6 +25,8 @@
 </div>
 <div id="bodyContainer">
 <h1>Geo-Quiz Home</h1>
+<div id="sitemap">Home</div>
+<div id="space"></div>
 <div id="leftList">
 <div id="eventList">
 	<table>
@@ -52,7 +54,7 @@
 	<% for (int i = 0; i < places.size(); i++) { 
 		Place p = places.get(i); %>
 		<tr>
-		<form action="editPlace" method="get">
+		<form action="editPlace" method="post">
 		<input type="hidden" name="id" value="<%=p.getId() %>" />
 		<td>
 		<input type="text" name="name" value="<%=p.getName() %>" />
@@ -64,7 +66,7 @@
 		</tr>
 	<% } %>
 	<tr>
-	<form action="addPlace" method="get">
+	<form action="addPlace" method="post">
 	<td><input type="text" name="name" /></td>
 	<td><input type="submit" value="Add place"/></td>
 	</form>
@@ -79,7 +81,7 @@
 	<% for (int i = 0; i < questions.size(); i++) { 
 		Question q = questions.get(i); %>
 		<tr>
-		<form action="editQuestion" method="get">
+		<form action="editQuestion" method="post">
 		<input type="hidden" name="id" value="<%=q.getId() %>" />
 		<td>
 		<input type="text" name="question" value="<%=q.getQuestion() %>" />
@@ -91,13 +93,13 @@
 		<input type="submit" value="change question" />
 		</td>
 		<td>
-		<a href="removeQuestion?questionId=<%=q.getId() %>">(rm)</a>
+		<a href="javascript:deleteQuestion(<%=q.getId() %>)">(rm)</a>
 		</td>
 		</form>
 		</tr>
 	<% } %>
 	<tr>
-	<form action="addQuestion" method="get">
+	<form action="addQuestion" method="post">
 	<td><input type="text" name="question" /></td>
 	<td><input type="text" name="answer" /></td>
 	<td><input type="submit" value="add question"/></td>
@@ -110,5 +112,17 @@
 <div style="clear:both"></div>
 </div>
 </div>
+<form name="deleteform" method="post" action="removeQuestion">
+<input type="hidden" name="questionId" />
+</form>
+<script language="JavaScript" type="text/javascript">
+<!--
+function deleteQuestion ( id )
+{
+  document.deleteform.questionId.value = id ;
+  document.deleteform.submit() ;
+}
+-->
+</script>
 </body>
 </html>

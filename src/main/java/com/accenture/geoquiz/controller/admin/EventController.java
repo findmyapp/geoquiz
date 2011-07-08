@@ -39,7 +39,7 @@ public class EventController {
 	/**
 	 * Controller for updating/saving events
 	 */
-	@RequestMapping(value="/admin/eventSubmit", method=RequestMethod.GET)
+	@RequestMapping(value="/admin/eventSubmit", method=RequestMethod.POST)
 	public ModelAndView submitEvent(
 			@RequestParam(required=true) int eventId,
 			@RequestParam(required=true) String title,

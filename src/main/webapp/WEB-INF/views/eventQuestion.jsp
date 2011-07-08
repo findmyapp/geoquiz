@@ -24,6 +24,8 @@
 </div>
 <div id="bodyContainer">
 <h1>Add new question to event <%=eventId %></h1>
+<div id="sitemap"><a href="home">Home</a>/<a href="event?eventId=<%=eventId %>">Event</a>/New question</div>
+<div id="space"></div>
 <% if (questions.size() > 0) { %>
 	<form action="addEventQuestion" method="get">
 	<div id="leftPane">
