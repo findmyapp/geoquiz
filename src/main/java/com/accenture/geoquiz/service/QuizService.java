@@ -220,6 +220,7 @@ public class QuizService {
 	 */
 	public int submitAnswers(String user, String answers) {
 		User u = gson.fromJson(user, User.class);
+		logger.info(u.getEmail());
 		Type listType = new TypeToken<List<Question>>() {}.getType();
 		List<Question> hisAnswers = gson.fromJson(answers, listType);
 		List<Question> theAnswers = questionData.getQuestion(u.getEventId());
@@ -252,7 +253,7 @@ public class QuizService {
 		
 		u.setAnswered(0);
 		userData.createUser(u);
-		data.addObject("event", e);
+		data.addObject("events", e);
 		return data;
 	}
 }

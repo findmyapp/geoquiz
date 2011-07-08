@@ -29,7 +29,7 @@ public class JsonController {
 	private static final Logger logger = LoggerFactory.getLogger(JsonController.class);
 
 	/**
-	 * List all open events
+	 * List all open events without questions
 	 */
 	@RequestMapping(value="/events", method=RequestMethod.GET)
 	public ModelAndView getOpenEvents() {
@@ -66,15 +66,15 @@ public class JsonController {
 			@RequestParam(required=true) String answers) {
 		logger.info("Recieved answers");
 		int correct = service.submitAnswers(user, answers);
-		return new ModelAndView("json", "correct", 1);
+		return new ModelAndView("json", "events", correct);
 	}
+	@RequestMapping(value="/createUser", method=RequestMethod.GET)
 	public ModelAndView createUser(
 			@RequestParam(required=true) String user) {
 		logger.info("Request to create a new user");
 		ModelAndView data = service.createUser(user);
 		data.setViewName("json");
 		return data;
-		
 	}
 }
 
