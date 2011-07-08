@@ -20,6 +20,7 @@ import com.accenture.geoquiz.controller.admin.EventQuestionController;
 import com.accenture.geoquiz.datasource.*;
 import com.accenture.geoquiz.model.*;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 @Service
@@ -259,22 +260,29 @@ public class QuizService {
 	}
 	public ModelAndView createUser(String user) {
 		ModelAndView data = new ModelAndView();
+		Event e = null;
+		User u = null;
 		try {
-			User u = gson.fromJson(user, User.class);
-			Event e = this.getHashedEvent(u.getEventId());
-			if (e == null || !e.isOpen()) {
-				data.addObject("Accepted", false);
-				return data;
-			}
-			data.addObject("Accepted", true);
-			u.setAnswered(0);
-			userData.createUser(u);
-			data.addObject("events", gson.toJson(e));
-			return data;
-		} catch (Exception e) {
-			//probably parsing error or user already exists
-			e.printStackTrace();
-			return new ModelAndView();
+			u = gson.fromJson(user, User.class);
 		}
+		catch (JsonSyntaxException exception) {
+			exception.printStackTrace();
+			return data;
+		}
+		e = getHashedEvent(u.getEventId());
+		if (e == null || !e.isOpen()) {
+			data.addObject("Accepted", false);
+			return data;
+		}
+		data.addObject("Accepted", true);
+		u.setAnswered(0);
+		try {
+			userData.createUser(u);
+		} 
+		catch (Exception exception) {
+			//user probably already exists
+		}
+		data.addObject("events", gson.toJson(e));
+		return data;
 	}
 }
