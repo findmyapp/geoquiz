@@ -82,6 +82,9 @@ public class QuizService {
 			}
 			event.setQuestions(questions);
 		}
+		if (event.isRandom()) {
+			permute(event.getQuestions());
+		}
 		return event;
 	}
 	
@@ -101,7 +104,7 @@ public class QuizService {
 	public Place getPlace(int id) {
 		return placeData.getPlace(id);
 	}
-	public Status submitEvent(int eventId, String title, String date, int placeId, Boolean open) {
+	public Status submitEvent(int eventId, String title, String date, int placeId, Boolean open, Boolean random) {
 		Date eventDate = null;
 		Status status = new Status();
 		try {
@@ -109,17 +112,20 @@ public class QuizService {
 			if (open == null) {
 				open = false;
 			}
+			if (random == null) {
+				random = false;
+			}
 			if (!whiteService.isValid(title)) {
 				logger.info("title was invalid, "+title);
 				status.setNotification("Illegal characters in title, could not save.");
 				status.setError(true);
 			}
 			else if (eventId == -1) {//create new event
-				eventId = eventData.createEvent(title, eventDate, placeId, open);
+				eventId = eventData.createEvent(title, eventDate, placeId, open, random);
 				status.setNotification("Event created!");
 			}
 			else {//update old event
-				eventData.updateEvent(eventId, title, eventDate, placeId, open);
+				eventData.updateEvent(eventId, title, eventDate, placeId, open, random);
 				status.setNotification("Event "+title+" updated!");
 			}
 		} catch (ParseException e) {
@@ -219,7 +225,14 @@ public class QuizService {
 		return status;
 	}
 	public void removeEventQuestion(int eventId, int questionId) {
+		List<Question> questions = questionData.getQuestion(eventId);
+		if (questionId != questions.get(questions.size()-1).getId()) {//keep post_num in order
+			questionData.swapQuestion(eventId, questionId, questions.get(questions.size()-1).getId());
+		}
 		questionData.removeEventQuestion(eventId, questionId);
+	}
+	public void swapEventQuestion(int eventId, int questionIdA, int questionIdB) {
+		questionData.swapQuestion(eventId, questionIdA, questionIdB);
 	}
 	/**
 	 * Checks how many answers that are correct
@@ -284,5 +297,15 @@ public class QuizService {
 		}
 		data.addObject("events", gson.toJson(e));
 		return data;
+	}
+	public void permute(List<Question> questions) {
+		Question q;
+		int rand;
+		for (int i = 0; i < questions.size(); i++) {
+			rand = (int)((questions.size()-i)*Math.random()+i);
+			q = questions.get(i);
+			questions.set(i, questions.get(rand));
+			questions.set(rand, q);
+		}
 	}
 }

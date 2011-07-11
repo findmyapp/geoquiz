@@ -38,22 +38,22 @@ public class EventRepository {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
 		return jdbcTemplate.query("SELECT * FROM event AS e, place AS p WHERE e.place_id=p.id AND e.is_open='true' ORDER BY event_date DESC", new EventRowMapper());
 	}
-	public void updateEvent(int eventId, String title, Date date, int placeId, Boolean open) {
+	public void updateEvent(int eventId, String title, Date date, int placeId, Boolean open, Boolean random) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
-		jdbcTemplate.update("UPDATE event SET title=?, event_date=?, place_id=?, is_open=? WHERE id=?", title, date, placeId, open, eventId);
+		jdbcTemplate.update("UPDATE event SET title=?, event_date=?, place_id=?, is_open=?, is_random=? WHERE id=?", title, date, placeId, open, random, eventId);
 	}
 	/**
 	 * Creates a new event and returns the eventId
 	 */
-	public int createEvent(String title, Date date, int placeId, Boolean open) {
+	public int createEvent(String title, Date date, int placeId, Boolean open, Boolean random) {
 		SqlUpdate su = new SqlUpdate();
 		su.setDataSource(ds);
-		su.setSql("INSERT into event (title, event_date, place_id, is_open) VALUES (?, ?, ?, ?)");
+		su.setSql("INSERT into event (title, event_date, place_id, is_open, is_random) VALUES (?, ?, ?, ?, ?)");
 		su.setReturnGeneratedKeys(true);
-		su.setTypes(new int[]{Types.VARCHAR, Types.DATE, Types.INTEGER, Types.BOOLEAN});
+		su.setTypes(new int[]{Types.VARCHAR, Types.DATE, Types.INTEGER, Types.BOOLEAN, Types.BOOLEAN});
 		su.compile();
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-		su.update(new Object[]{title, date, placeId, open}, keyHolder);
+		su.update(new Object[]{title, date, placeId, open, random}, keyHolder);
 		return keyHolder.getKey().intValue();//eventid
 	}
 }

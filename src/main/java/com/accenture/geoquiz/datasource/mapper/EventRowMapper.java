@@ -19,6 +19,7 @@ public class EventRowMapper implements RowMapper<Event> {
 		place.setId(rs.getInt("place_id"));
 		place.setName(rs.getString("name"));
 		event.setPlace(place);
+		event.setRandom(rs.getBoolean("is_random"));
 		return event;
 	}
 }

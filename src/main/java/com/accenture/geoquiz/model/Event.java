@@ -11,6 +11,7 @@ public class Event {
 	private Place place;
 	private boolean isOpen;
 	private List<Question> questions;
+	private boolean isRandom;
 	
 	public int getId() {
 		return id;
@@ -47,5 +48,11 @@ public class Event {
 	}
 	public void setQuestions(List<Question> questions) {
 		this.questions = questions;
+	}
+	public boolean isRandom() {
+		return isRandom;
+	}
+	public void setRandom(boolean random) {
+		isRandom = random;
 	}
 }

@@ -40,10 +40,15 @@
 	<% String s = event.getEventDate().toString(); %>
 	Date: <input type="text" name="date" value="<%=s.substring(0, 10) %>" />yyyy-mm-dd<br />
 	<% if (event.isOpen()) {%>
-		Open: <input type="checkbox" name="open" value="true" checked /> <br />
+		Open: <input type="checkbox" name="open" value="true" checked /> 
 	<%} else { %>
-		Open: <input type="checkbox" name="open" value="true" /> <br />
+		Open: <input type="checkbox" name="open" value="true" /> 
 	<%} %>
+	<% if (event.isRandom()) { %>
+		Random post order: <input type="checkbox" name="random" value="true" checked /> <br />
+	<% } else { %>
+		Random post order: <input type="checkbox" name="random" value="true" /> <br />
+	<% } %>
 	</div>
 	<div id="eventPlaceList">
 	<h2>Places:</h2>
@@ -68,7 +73,7 @@
 <%} else { %>
 	<table>
 	<tr>
-	<th>Question</th><th>Post Description</th><th>Activation code</th><th>Remove</th>
+	<th>Question</th><th>Post Description</th><th>Activation code</th><th>Remove</th><th>Move</th>
 	</tr>
 	<% for (int i = 0; i < event.getQuestions().size(); i++) {
 		Question q = event.getQuestions().get(i);%>
@@ -78,10 +83,15 @@
 		<td><%=q.getActivationCode() %></td>
 		<td>
 		<a href="removeEventQuestion?eventId=<%=event.getId() %>&questionId=<%=q.getId() %>"> (rm)</a></td>
+		<td>
+		<% if (i > 0) { %>
+			<a href="swapEventQuestion?eventId=<%=event.getId() %>&questionIdA=<%=q.getId() %>&questionIdB=<%=event.getQuestions().get(i-1).getId() %>">up</a>
+		<% } %>
+		</td>
 		</tr>
 	<%} %>
 	</table>
-	<a href="eventQuestion?eventId=<%=event.getId() %>">+New question</a>
+	<a href="eventQuestion?eventId=<%=event.getId() %>">+New question</a> When not using random post order, the top question will be the first post
 <%} %>
 </div>
 </div>

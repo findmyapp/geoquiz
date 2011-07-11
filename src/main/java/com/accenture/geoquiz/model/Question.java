@@ -7,6 +7,7 @@ public class Question {
 	private String answer;
 	private String postDescription;
 	private String activationCode;
+	private int postNum;
 	
 	public void setId(int id) {
 		this.id = id;
@@ -37,5 +38,11 @@ public class Question {
 	}
 	public String getActivationCode() {
 		return activationCode;
+	}
+	public int getPostNum() {
+		return postNum;
+	}
+	public void setPostNum(int postNum) {
+		this.postNum = postNum;
 	}
 }

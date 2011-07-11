@@ -19,6 +19,7 @@ public class QuestionRowMapper implements RowMapper<Question> {
 		if (linkedToEvent) {
 			question.setPostDescription(rs.getString("description"));
 			question.setActivationCode(rs.getString("activation_code"));
+			question.setPostNum(rs.getInt("post_num"));
 		}
 		question.setQuestion(rs.getString("question"));
 		question.setAnswer(rs.getString("answer"));

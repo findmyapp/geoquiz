@@ -65,4 +65,13 @@ public class EventQuestionController {
 		service.removeEventQuestion(eventId, questionId);
 		return new ModelAndView("redirect:event?eventId="+eventId);
 	}
+	@RequestMapping(value="/admin/swapEventQuestion", method=RequestMethod.GET)
+	public ModelAndView swapEventQuestion(
+			@RequestParam(required=true) int eventId,
+			@RequestParam(required=true) int questionIdA,
+			@RequestParam(required=true) int questionIdB) {
+		logger.info("swapping questions");
+		service.swapEventQuestion(eventId, questionIdA, questionIdB);
+		return new ModelAndView("redirect:event?eventId="+eventId);
+	}
 }

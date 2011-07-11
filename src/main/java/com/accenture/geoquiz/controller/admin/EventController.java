@@ -45,8 +45,9 @@ public class EventController {
 			@RequestParam(required=true) String title,
 			@RequestParam(required=true) String date,
 			@RequestParam(required=false) Boolean open,
+			@RequestParam(required=false) Boolean random,
 			@RequestParam(required=true) int placeId) {
-		Status status = service.submitEvent(eventId, title, date, placeId, open);
+		Status status = service.submitEvent(eventId, title, date, placeId, open, random);
 		return getLists(status.getId(), status);
 	}
 

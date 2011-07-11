@@ -68,6 +68,11 @@ public class JsonController {
 		int correct = service.submitAnswers(user, answers);
 		return new ModelAndView("json", "events", correct);
 	}
+	/**
+	 * Create user and recieve answers
+	 * @param user
+	 * @return
+	 */
 	@RequestMapping(value="/createUser", method=RequestMethod.GET)
 	public ModelAndView createUser(
 			@RequestParam(required=true) String user) {
