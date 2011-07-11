@@ -241,6 +241,7 @@ public class QuizService {
 				for (int j = 0; j < hisAnswers.size(); j++) {
 					if (theAnswers.get(i).getId() == hisAnswers.get(j).getId() && theAnswers.get(i).getAnswer().equalsIgnoreCase(hisAnswers.get(j).getAnswer())) {
 						equal++;
+						break;
 					}
 				}
 			}
