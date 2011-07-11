@@ -68,7 +68,7 @@ Ext.setup({
 		var loginForm = new Ext.form.FormPanel({
 			items:[{
 		        xtype: 'fieldset',
-		        title: 'Skriv inn et brukernavn og epost:',
+		        title: 'Skriv inn et kallenavn og epost:',
 		        defaults: {
 		            required: true,
 		            labelAlign: 'center'
@@ -76,7 +76,7 @@ Ext.setup({
 		        items: [{
 		                xtype: 'textfield',
 		                name: 'bruker',
-		                label: 'Brukernavn',
+		                label: 'Kallenavn',
 		                value: (user!=null)?user.nickname:''
 		            }, {
 		                xtype: 'emailfield',
@@ -126,6 +126,7 @@ Ext.setup({
 	        	required: true
 	        },{
 	        	xtype: 'button',
+	        	padding: 5,
 	        	text: 'Vi har funnet posten!',
 	        	ui: 'action-round',
 	        	// handler for "Funnet post"-knapp
@@ -138,7 +139,27 @@ Ext.setup({
 	        			// Gi feilmelding!
 	        		}
 	        	}
-	        }]
+	        },{
+	        	xtype: 'button',
+	        	cls: 'decline-button',
+	        	text: 'Jeg gir opp! Neste post...',
+	        	ui: 'decline-round',
+	        	// Handler for "Lever svar"-knapp
+	        	handler: function(){
+	        		var nextPost = postNr + 1;
+        			
+        			// If there is more posts left, go to next
+        			if(nextPost<=numberOfPosts){
+	        			setQuestion(nextPost);
+        			}
+        			else{
+        				goToFinish();
+        			}
+	        	}
+	       },{
+	    	   html: '<p>Kan ikke angres!!</p>',
+	    	   cls: 'warning-text'
+	       }]
 		});
 		
 		var answerPostView = new Ext.Panel({
@@ -152,6 +173,7 @@ Ext.setup({
 	        	label: 'Svar',
 	        	required: true
 	        },{
+	        	padding: 5,
 	        	xtype: 'button',
 	        	text: 'Send inn svar',
 	        	ui: 'action-round',
@@ -176,14 +198,39 @@ Ext.setup({
 	        			}
 	        			// else show "You're finished!"
 	        			else {
-	        				quizHeader.setTitle('Hurra!');
-	        				quizView.setActiveItem(2);
+	        				goToFinish();
 	        			}
 	        			
 	        		}
 	        	}
+	       },{
+	        	xtype: 'button',
+	        	cls: 'decline-button',
+	        	text: 'Hopp til neste post',
+	        	ui: 'decline-round',
+	        	// Handler for "Lever svar"-knapp
+	        	handler: function(){
+	        		var nextPost = postNr + 1;
+        			
+        			// If there is more posts left, go to next
+        			if(nextPost<=numberOfPosts){
+	        			setQuestion(nextPost);
+	        			quizView.setActiveItem(0);
+        			}
+        			else{
+        				goToFinish();
+        			}	
+	        	}
+	       },{
+	    	   html: '<p>Kan ikke angres!!</p>',
+	    	   cls: 'warning-text'
 	       }]
 		});
+		
+		function goToFinish(){
+			quizHeader.setTitle('Hurra!');
+			quizView.setActiveItem(2);
+		}
 		
 		var youAreFinishedView = new Ext.Panel({
 			padding: 10,
@@ -236,7 +283,7 @@ Ext.setup({
 		    }],
 		    items: [{
 		    		padding: 10,
-		    		html: '<p>Her kan du levere inn svarene for de postene du har klart. Du kan levere inn svar s&aring; mange ganger du vil!</p>'
+		    		html: '<p>Ved &aring; trykke p&aring; knappen under kan du levere inn svarene for de postene du har klart. Du kan levere inn svar s&aring; mange ganger du vil!</p>'
 		        },{
 		            padding: 10,
 		            margin: 10,
@@ -295,7 +342,7 @@ Ext.setup({
 				findPostView.getComponent('kode').setValue('');
 				
 				// Update title, description and question text
-				quizHeader.setTitle('Post ' + postNum + '/' + numberOfPosts);
+				quizHeader.setTitle('Post ' + postNum + '/' + numberOfPosts + ' (klart '+ answers.length +')');
 				postDescription.update('<p style="font-weight: bold">Beskrivelse:</p><p>'+question.postDescription+'</p>');
 				postQuestion.update('<p style="font-weight: bold">Sp&oslash;rsm&aring;l:</p><p>'+question.question+'</p>');
 			

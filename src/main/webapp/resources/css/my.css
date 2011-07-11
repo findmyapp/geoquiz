@@ -1,3 +1,15 @@
 .welcome {
 	font-weight: bold;
 }
+
+.decline-button {
+	width: 270px;
+	margin: 40px auto 0 auto;	
+}
+
+.warning-text {
+	color: #b22222;
+	font-size: 14px;	
+	text-align: center;
+	font-weight: bold;
+}
