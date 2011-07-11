@@ -107,6 +107,7 @@
 	</form>
 	</tr>
 	</table>
+	Removing a question will cause it to be removed from all events where it is used!
 </div>
 </div>
 <div style="clear:both"></div>
