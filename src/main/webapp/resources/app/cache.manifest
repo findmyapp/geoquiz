@@ -1,0 +1,7 @@
+# v1
+# this is how you add a comment to the manifest.
+CACHE MANIFEST
+hr.js
+
+NETWORK:
+test.html

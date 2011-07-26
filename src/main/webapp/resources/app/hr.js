@@ -15,14 +15,21 @@ Ext.setup({
 		/* INIT */
 		var init = function() {
 			
-			// Load user from local storage
+			// Load user, event and answers from local storage
 			user = loadObject('user');
+			event = loadObject('event');
+			answers = loadObject('answers');
+			postNr = parseInt( loadValue('postNr') );
+			
+			if(answers==null){
+				answers = [];
+			}
 			
 		}();
 		
 		/**#########################################
 		 * WELCOME VIEW
-		 ##########################################*/
+		 ##########################################*/	
 		var welcomeBar = new Ext.Toolbar({
     		dock: 'bottom',
     		title: 'Velkommen',
@@ -32,38 +39,81 @@ Ext.setup({
     		    	text: 'Start',
     		    	ui: 'action-round',
     		    	handler: function(){
-    		    		var user = loginForm.getValues().bruker;
-    		    		var email_f = loginForm.getValues().epost;    		    
     		    		
-    		    		if(user.length>0 && validateEmail(email_f)){
+    		    		// If no network connection
+    		    		if(!navigator.onLine){
+    		    			setWelcomeFail('Finner ikke nettverkstilkobling...');
+    		    			return;
+    		    		}
+    		    		
+    		    		var nickname = nicknameField.getValue();
+    		    		var email_f = emailField.getValue();   
+    		    		var eventId = eventSelect.getValue();
+    		    		
+    		    		if(eventId==-1){
+    		    			setWelcomeFail('Du har ikke valgt noen event!');
+    		    			return;
+    		    		}
+    		    		
+    		    		// Validate username and email
+    		    		if(nickname.length>0 && validateEmail(email_f)){
     		    			welcomeView.setLoading(true);
     		    			
     		    			user = {
-    		    				nickname: user,	
+    		    				nickname: nickname,	
     		    				email: email_f,
-    		    				eventId: 0 // This must be generic!
+    		    				eventId: eventId
     		    			};
     		    			
     		    			saveObject('user', user);
-    		    			
+
     		    			// AJAX-call from jQuery (really ugly!!)
-    		    			//$.getJSON('event?eventId=0', function(data){
-    		    			$.getJSON('createUser?user=' + JSON.stringify(user) , function(data){
+    		    			var con = $.getJSON('createUser?user=' + JSON.stringify(user) , function(data){
     		    				event = data;
-    		    				saveObject('event', event);
-    		    				numberOfPosts = event.questions.length;
-    		    				setQuestion(1);
-    		    				welcomeView.setLoading(false);
-    		    				mainView.setActiveItem(1);
+    		    				startEvent(event, 1); // Starte event med post nummer 1
+    		    				
+    		    				// remove error text
+    		    				setWelcomeFail('');
+    		    			});
+    		    			
+    		    			con.error(function(){
+    		    				setWelcomeFail('Klarer ikke koble til nettverket...');
     		    			});
     		    		}
     		    		// Illegal arguments in form
     		    		else {
-    		    			alert('Ugyldig brukernavn/passord');
+    		    			setWelcomeFail('Ugyldig kallenavn eller epost!');
     		    		}
     		    	}
     			}]
     		});
+		
+		function setWelcomeFail(text){
+			welcomeView.setLoading(false);
+			fail.update('<p>'+text+'</p>');
+			welcomeView.add(fail);
+			welcomeView.doLayout();
+		}
+		
+		var nicknameField = new Ext.form.Text({
+            name: 'bruker',
+            label: 'Kallenavn',
+            value: (user!=null)?user.nickname:''
+        });
+		
+		var emailField = new Ext.form.Text({
+			name: 'epost',
+            label: 'Epost',
+            value: (user!=null)?user.email:''
+        });
+		
+		var eventSelect = new Ext.form.Select({
+			name: 'epost',
+            label: 'Event',
+            options: [
+                {text: 'Velg event',  value: -1}
+            ]
+		});
 		
 		var loginForm = new Ext.form.FormPanel({
 			items:[{
@@ -73,17 +123,11 @@ Ext.setup({
 		            required: true,
 		            labelAlign: 'center'
 		        },
-		        items: [{
-		                xtype: 'textfield',
-		                name: 'bruker',
-		                label: 'Kallenavn',
-		                value: (user!=null)?user.nickname:''
-		            }, {
-		                xtype: 'emailfield',
-		                name: 'epost',
-		                label: 'Epost',
-		                value: (user!=null)?user.email:''
-		        }]
+		        items: [
+		            nicknameField,
+		            emailField,
+		            eventSelect
+		        ]
 			}]
 		});
 		
@@ -114,6 +158,12 @@ Ext.setup({
 			html: 'Not started'
 		});
 		
+		var fail = new Ext.Panel({
+			cls: 'error-text',
+			padding: 10,
+			html: 'Not started'
+		});
+		
 		var findPostView = new Ext.Panel({
 			padding: 10,
 			items: [
@@ -133,10 +183,14 @@ Ext.setup({
 	        	handler: function(){
 	        		var value = findPostView.getComponent('kode').getValue().toLowerCase();
 	        		if(hex_sha1(value)==question.activationCode){
+	        			fail.update('');
 	        			quizView.setActiveItem(1);
 	        		}
 	        		else {
 	        			// Gi feilmelding!
+	        			fail.update('<p>Feil kode!</p>');
+	        			findPostView.insert(3, fail);
+	        			findPostView.doLayout();
 	        		}
 	        	}
 	        },{
@@ -148,6 +202,8 @@ Ext.setup({
 	        	handler: function(){
 	        		var nextPost = postNr + 1;
         			
+	        		fail.update('');
+	        		
         			// If there is more posts left, go to next
         			if(nextPost<=numberOfPosts){
 	        			setQuestion(nextPost);
@@ -183,13 +239,18 @@ Ext.setup({
 	        		
 	        		// If correct answer
 	        		if(hex_sha1(value)==question.answer){
-	        			var nextPost = postNr + 1;
+	        			var nextPost = (postNr + 1);
 	        			
-	        			// Add answer to answer list
-	        			answers.push({
-	        				id: question.id,
-	        				answer: value
-	        			});
+	        			// Add answer to answer list (if not exist)
+	        			if(!inArray(question.id, answers)){
+	        				answers.push({
+		        				id: question.id,
+		        				answer: value
+		        			});
+	        			}
+	        			
+	        			saveObject('answers', answers);
+	        			fail.update('');
 	        			
 	        			// If there is more posts left, go to next
 	        			if(nextPost<=numberOfPosts){
@@ -198,9 +259,14 @@ Ext.setup({
 	        			}
 	        			// else show "You're finished!"
 	        			else {
+	        				saveValue('postNr', nextPost);
 	        				goToFinish();
-	        			}
-	        			
+	        			}	
+	        		}
+	        		else {
+	        			fail.update('<p>Feil svar!</p>');
+	        			answerPostView.insert(3, fail);
+	        			answerPostView.doLayout();
 	        		}
 	        	}
 	       },{
@@ -212,6 +278,8 @@ Ext.setup({
 	        	handler: function(){
 	        		var nextPost = postNr + 1;
         			
+	        		fail.update('');
+	        		
         			// If there is more posts left, go to next
         			if(nextPost<=numberOfPosts){
 	        			setQuestion(nextPost);
@@ -273,6 +341,13 @@ Ext.setup({
 		/**#####################################################
 		 *                 FINISH VIEW
 		 ######################################################*/
+		function setFinishFail(text){
+			finishView.setLoading(false);
+			fail.update('<p>'+text+'</p>');
+			finishView.insert( 2, fail);
+			finishView.doLayout();
+		}
+		
 		var finishView = new Ext.Panel({
 			iconCls: 'action',
 			title: 'Send svar',
@@ -291,14 +366,40 @@ Ext.setup({
 		    	    text: 'Send inn svar!',
 		    	    ui: 'action-round',
 		    	    handler: function(){
-		    	    	finishView.setLoading(true);
-		    	    	//alert('respond?user='+JSON.stringify(user)+'&answers='+JSON.stringify(answers));
-		    	    	$.get('respond?user='+JSON.stringify(user)+'&answers='+JSON.stringify(answers), function(data){
-		    	    		alert('High performance. Delivered.');
+		    	    	
+		    	    	// If no network connection
+    		    		if(!navigator.onLine){
+    		    			setFinishFail('Finner ikke nettverkstilkobling...');
+    		    			return;
+    		    		}
+		    	    	
+    		    		// Start loader
+    		    		finishView.setLoading(true);
+    		    		
+		    	    	var con = $.get('respond?user='+JSON.stringify(user)+'&answers='+JSON.stringify(answers), function(data){
+		    	    		setFinishFail('<span style="color: #228b22">High performance. Delivered.</span>');
 		    	    		finishView.setLoading(false);
 		    	    	});
+		    	    	con.error(function(){
+		    	    		setFinishFail('Problemer med nettverkstilkoblingen...');
+		    	    	});
 		    	    }
-		    }]
+		    },{
+	        	xtype: 'button',
+	        	cls: 'decline-button',
+	        	text: 'Avslutt',
+	        	ui: 'decline-round',
+	        	// Handler for "Avslutt"-knapp
+	        	handler: function(){
+	        		clearEvent();
+	        		quiz.setActiveItem(0);
+	        		loadEventsList();
+	        		mainView.setActiveItem(0);
+	        	}
+	       },{
+	    	   html: '<p>Husk &aring; levere inn svar f&oslash;r du avslutter!!</p>',
+	    	   cls: 'warning-text'
+	       }]
 		});
 		
 		/**#####################################################
@@ -337,6 +438,9 @@ Ext.setup({
 				postNr = postNum;
 				question = event.questions[postNum-1];
 				
+				// Save postNr to local storage
+				saveValue('postNr', postNr);
+				
 				// Reset text fields
 				answerPostView.getComponent('svar').setValue('');
 				findPostView.getComponent('kode').setValue('');
@@ -347,42 +451,51 @@ Ext.setup({
 				postQuestion.update('<p style="font-weight: bold">Sp&oslash;rsm&aring;l:</p><p>'+question.question+'</p>');
 			
 			}
+			else {
+				mainView.setActiveItem(1);
+				goToFinish();
+			}
 		}
 		
-		/**##############################################
-		 * TRASH CAN (will be deleted when this thing is finished)
-		 ###############################################*/
-		/*
-		var operation = new Ext.data.Operation({
-		    action: 'read',
-		    eventId : 0
-		});
-
-		var eventAjax = new Ext.data.AjaxProxy({
-		    url: '/geo-quiz/event'
-		});
+		function startEvent(event, postNr){
+			saveObject('event', event);
+			numberOfPosts = event.questions.length;
+			setQuestion(postNr);
+			welcomeView.setLoading(false);
+			mainView.setActiveItem(1);
+		}
 		
-		// Data models
-		Ext.regModel('User', {
-			fields: [
-			         'id',
-			         'username',
-			         'email',
-			         'postsCleared'
-			]
-		});
+		function clearEvent(){
+			event = null;
+			deleteObject('event');
+			answers = [];
+			deleteObject('answers');
+			postNr = 1;
+			deleteValue('postNr');
+		}
 		
-		var userStore = new Ext.data.JsonStore({
-			storeId: 'users',
-		    proxy: {
-		    	id  : 'user',
-		    	model: 'User',
-		    	type: 'localstorage',
-				reader: {
-					type: 'json',
-					root: 'user'
+		function loadEventsList(){
+			$.getJSON('events',function(data){
+				var res = [];
+				for(var i = 0; i<data.length; i++){
+					res.push({
+						text: data[i].title,  
+						value: data[i].id
+					});
 				}
-		    }
-		});*/
+				eventSelect.setOptions(res, false);
+				if(data.length>0)
+					eventSelect.setValue(data[0].id);
+			});
+		}
+		
+		// Auto-load old event
+		if(event!=null && user!=null){
+			startEvent(event, postNr);
+		}
+		// Download list with open events
+		else {
+			loadEventsList();
+		}
 	}
 });

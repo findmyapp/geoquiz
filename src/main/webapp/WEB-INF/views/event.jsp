@@ -96,7 +96,7 @@
 </div>
 </div>
 <div id="responders">
-<h2>Responders</h2>
+<h2>Responfders</h2>
 	<table>
 	<tr>
 	<th>Nickname</th><th>E-mail</th><th>Phone</th><th>Answered</th><th>Finish time</th>
